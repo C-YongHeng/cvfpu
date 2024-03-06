@@ -491,11 +491,13 @@ or on 16b inputs producing 32b outputs");
     for (genvar fmt = 0; fmt < NUM_FORMATS; fmt++) begin : pack_fp_result
       // Set up some constants
       if (OpGroup == fpnew_pkg::DOTP) begin
-        localparam int unsigned INACTIVE_MASK = fpnew_pkg::fp_width(fpnew_pkg::fp_format_e'(LANE_FORMATS[fmt]));
-        localparam int unsigned FP_WIDTH      = fpnew_pkg::minimum(INACTIVE_MASK, fpnew_pkg::fp_width(fpnew_pkg::fp_format_e'(fmt)));
+        // localparam int unsigned INACTIVE_MASK = fpnew_pkg::fp_width(fpnew_pkg::fp_format_e'(LANE_FORMATS[fmt]));
+        // localparam int unsigned FP_WIDTH      = fpnew_pkg::minimum(INACTIVE_MASK, fpnew_pkg::fp_width(fpnew_pkg::fp_format_e'(fmt)));
+        localparam int unsigned FP_WIDTH      = fpnew_pkg::minimum(fpnew_pkg::fp_width(fpnew_pkg::fp_format_e'(LANE_FORMATS[fmt])), fpnew_pkg::fp_width(fpnew_pkg::fp_format_e'(fmt)));
         // only for active formats within the lane
         if (ACTIVE_FORMATS[fmt] && (LANE_WIDTH>0)) begin
-          if (FP_WIDTH==INACTIVE_MASK) begin
+          // if (FP_WIDTH==INACTIVE_MASK) begin
+          if (FP_WIDTH==fpnew_pkg::fp_width(fpnew_pkg::fp_format_e'(LANE_FORMATS[fmt]))) begin
             assign fmt_slice_result[fmt][(LANE+1)*FP_WIDTH-1:LANE*FP_WIDTH] =
                 local_result[FP_WIDTH-1:0];
           end else begin

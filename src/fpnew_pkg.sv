@@ -554,7 +554,8 @@ package fpnew_pkg;
 
   // Return whether any active format is set as MERGED
   function automatic logic any_enabled_multi(fmt_unit_types_t types, fmt_logic_t cfg);
-    for (int unsigned i = 0; i < NUM_FP_FORMATS; i++)
+    int unsigned i = 0;
+    for (i = 0 ; i < NUM_FP_FORMATS; i++)
       if (cfg[i] && types[i] == MERGED)
         return 1'b1;
       return 1'b0;
@@ -564,7 +565,8 @@ package fpnew_pkg;
   function automatic logic is_first_enabled_multi(fp_format_e fmt,
                                                   fmt_unit_types_t types,
                                                   fmt_logic_t cfg);
-    for (int unsigned i = 0; i < NUM_FP_FORMATS; i++) begin
+    int unsigned i = 0;
+    for (i = 0; i < NUM_FP_FORMATS; i++) begin
       if (cfg[i] && types[i] == MERGED) return (fp_format_e'(i) == fmt);
     end
     return 1'b0;
@@ -572,7 +574,8 @@ package fpnew_pkg;
 
   // Returns the first format that is active and is set as MERGED
   function automatic fp_format_e get_first_enabled_multi(fmt_unit_types_t types, fmt_logic_t cfg);
-    for (int unsigned i = 0; i < NUM_FP_FORMATS; i++)
+    int unsigned i = 0;
+    for (i = 0; i < NUM_FP_FORMATS; i++)
       if (cfg[i] && types[i] == MERGED)
         return fp_format_e'(i);
       return fp_format_e'(0);
@@ -583,7 +586,8 @@ package fpnew_pkg;
                                                      fmt_unit_types_t types,
                                                      fmt_logic_t cfg);
     automatic int unsigned res = 0;
-    for (int unsigned i = 0; i < NUM_FP_FORMATS; i++) begin
+    int unsigned i = 0;
+    for (i = 0; i < NUM_FP_FORMATS; i++) begin
       if (cfg[i] && types[i] == MERGED) res = maximum(res, regs[i]);
     end
     return res;

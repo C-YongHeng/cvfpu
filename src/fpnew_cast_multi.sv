@@ -634,15 +634,15 @@ module fpnew_cast_multi #(
     localparam int unsigned EXP_BITS = fpnew_pkg::exp_bits(fpnew_pkg::fp_format_e'(fmt));
     localparam int unsigned MAN_BITS = fpnew_pkg::man_bits(fpnew_pkg::fp_format_e'(fmt));
 
-    localparam logic [EXP_BITS-1:0] QNAN_EXPONENT = '1;
-    localparam logic [MAN_BITS-1:0] QNAN_MANTISSA = 2**(MAN_BITS-1);
+    // localparam logic [EXP_BITS-1:0] QNAN_EXPONENT = '1;
+    // localparam logic [MAN_BITS-1:0] QNAN_MANTISSA = 2**(MAN_BITS-1);
 
     if (FpFmtConfig[fmt]) begin : active_format
       always_comb begin : special_results
         logic [FP_WIDTH-1:0] special_res;
         special_res = info_q.is_zero
                       ? input_sign_q << FP_WIDTH-1 // signed zero
-                      : {1'b0, QNAN_EXPONENT, QNAN_MANTISSA}; // qNaN
+                      : {1'b0, {EXP_BITS{1'b1}}, 1'b1, {(MAN_BITS-1){1'b0}} }; // qNaN
 
         // Initialize special result with ones (NaN-box)
         fmt_special_result[fmt]               = '1;

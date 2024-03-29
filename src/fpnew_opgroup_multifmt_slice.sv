@@ -67,10 +67,10 @@ module fpnew_opgroup_multifmt_slice #(
 );
 
   if ((OpGroup == fpnew_pkg::DIVSQRT) && !PulpDivsqrt &&
-      !((FpFmtConfig[0] == 1) && (FpFmtConfig[1:NUM_FORMATS-1] == '0))) begin
-    $fatal(1, "T-Head-based DivSqrt unit supported only in FP32-only configurations. \
+      !((FpFmtConfig[0] == 1 || FpFmtConfig[1] ==1) && (FpFmtConfig[2:NUM_FORMATS-1] == '0))) begin
+    $fatal(1, "T-Head-based DivSqrt unit supported only in FP32 and FP64 configurations. \
 Set PulpDivsqrt to 1 not to use the PULP DivSqrt unit \
-or set Features.FpFmtMask to support only FP32");
+or set Features.FpFmtMask to support only FP32 and FP64");
   end
 
   localparam int unsigned MAX_FP_WIDTH   = fpnew_pkg::max_fp_width(FpFmtConfig);
@@ -269,6 +269,37 @@ or set Features.FpFmtMask to support only FP32");
             .is_boxed_i      ( is_boxed_2op        ), // 2 operands
             .rnd_mode_i,
             .op_i,
+            .tag_i,
+            .mask_i          ( simd_mask_i[lane]   ),
+            .aux_i           ( aux_data            ),
+            .in_valid_i      ( in_valid            ),
+            .in_ready_o      ( lane_in_ready[lane] ),
+            .flush_i,
+            .result_o        ( op_result           ),
+            .status_o        ( op_status           ),
+            .extension_bit_o ( lane_ext_bit[lane]  ),
+            .tag_o           ( lane_tags[lane]     ),
+            .mask_o          ( lane_masks[lane]    ),
+            .aux_o           ( lane_aux[lane]      ),
+            .out_valid_o     ( out_valid           ),
+            .out_ready_i     ( out_ready           ),
+            .busy_o          ( lane_busy[lane]     ),
+            .reg_ena_i
+          );
+        end else if(!PulpDivsqrt && (LANE_FORMATS[0] || LANE_FORMATS[1]) && (LANE_FORMATS[2:fpnew_pkg::NUM_FP_FORMATS-1] == '0)) begin
+          fpnew_divsqrt_th_64 #(
+            .NumPipeRegs ( NumPipeRegs          ),
+            .PipeConfig  ( PipeConfig           ),
+            .TagType     ( TagType              ),
+            .AuxType     ( logic [AUX_BITS-1:0] )
+          ) i_fpnew_divsqrt_multi_th (
+            .clk_i,
+            .rst_ni,
+            .operands_i      ( local_operands[1:0] ), // 2 operands
+            .is_boxed_i      ( is_boxed_2op        ), // 2 operands
+            .rnd_mode_i,
+            .op_i,
+            .dst_fmt_i,
             .tag_i,
             .mask_i          ( simd_mask_i[lane]   ),
             .aux_i           ( aux_data            ),

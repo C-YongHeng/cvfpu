@@ -373,11 +373,15 @@ module fpnew_divsqrt_th_64_multi #(
   
   // Select func 1 cycle after div issue
   logic func_sel;
-  `FFLARNC(func_sel, 1'b1, op_starting, (func_sel|flush_i), 1'b0, clk_i, rst_ni)
+  logic func_sel_flush;
+  assign func_sel_flush = func_sel | flush_i;
+  `FFLARNC(func_sel, 1'b1, op_starting, func_sel_flush, 1'b0, clk_i, rst_ni)
 
   // Select operands 2 cycles after div issue
   logic op_sel;
-  `FFLARNC(op_sel, 1'b1, func_sel, (op_sel|flush_i), 1'b0, clk_i, rst_ni)
+  logic op_sel_flush;
+  assign op_sel_flush = op_sel | flush_i;
+  `FFLARNC(op_sel, 1'b1, func_sel, op_sel_flush, 1'b0, clk_i, rst_ni)
 
   ct_vfdsu_top i_ct_vfdsu_top (
     .cp0_vfpu_icg_en                ( 1'b0                      ), // Internal clock gating, (module enable) doesn't matter when the clk_gate module is redundant anyway
